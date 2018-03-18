@@ -58,20 +58,14 @@ def is_box_completed(new_line, lines_used):  # line ~> start_pos, end_pos, color
                             box = (new_line[0], player_colors[opponent_turn])
                             boxes.append(box)
                     else:  # our line may be the bottom side of a box THIS CHECK IS BAD
-                        #sys.stdout.write('Potential Partner: ')
-                        #print(line)
                         sys.stdout.write('Our Line: ')
                         print(new_line)
                         left = right = False
                         for vert_line in lines_used:
                             if vert_line[0][1] != vert_line[1][1]:  # line is vertical
                                 if new_line[0][0] == vert_line[1][0] and new_line[0][1] == vert_line[1][1]:  # left?
-                                    sys.stdout.write('Potential Left line is: ')
-                                    print(vert_line)
                                     left = True
                                 elif new_line[1][0] == vert_line[1][0] and new_line[1][1] == vert_line[1][1]:  # right?
-                                    sys.stdout.write('Potential Right line is: ')
-                                    print(vert_line)
                                     right = True
                         if left is True and right is True:
                             print('We have created a box by adding a BOTTOM')
@@ -194,7 +188,6 @@ def game_loop():
 
                     # NEED TO ADJUST THIS TO MAKE HORIZONTAL LINES HAVE LARGER VERTICAL WIGGLE
                     # NEED TO ADJUST THIS TO MAKE VERTICAL LINES HAVE LARGER HORIZONTAL WIGGLE
-                    horizontal_wiggle = vertical_wiggle = None
                     if x_start == x_end:  # horizontal
                         horizontal_wiggle = 20
                         vertical_wiggle = 4
@@ -213,7 +206,8 @@ def game_loop():
                         # If box, player continues next turn, and box added to boxes[]
                         if is_box_completed(line, lines_used):  # player continue, box added to boxes[]
                             print('We completed a box!')
-                            print('Player 1 Score: ' + str(player_score[opponent_turn]) + ', Player 2 Score: ' + str(player_score[not opponent_turn]))
+                            print('Player 1 Score: ' + str(player_score[opponent_turn]) +
+                                  ', Player 2 Score: ' + str(player_score[not opponent_turn]))
                         else:  # next player's turn
                             opponent_turn = not opponent_turn
                         lines_used.append(my_line)
@@ -246,7 +240,6 @@ def game_loop():
         # We must draw our '1' or '2' inside of boxes the players own
         box_font = pygame.font.Font('ARCADECLASSIC.TTF', 25)
         for box in boxes:
-            box_text_surface = None
             if box[1] == player_colors[0]:
                 box_text_surface = box_font.render('1', True, box[1])
             else:
