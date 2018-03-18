@@ -186,9 +186,7 @@ def game_loop():
                     x_end = line[1][0]
                     y_end = line[1][1]
 
-                    # NEED TO ADJUST THIS TO MAKE HORIZONTAL LINES HAVE LARGER VERTICAL WIGGLE
-                    # NEED TO ADJUST THIS TO MAKE VERTICAL LINES HAVE LARGER HORIZONTAL WIGGLE
-                    if x_start == x_end:  # horizontal
+                    if x_start == x_end:  # horizontal.. make horizontal/vertical lines easier to match
                         horizontal_wiggle = 20
                         vertical_wiggle = 4
                     else:
@@ -203,7 +201,6 @@ def game_loop():
                         orientation = line[3]
                         my_line = (start_pos, end_pos, player_colors[opponent_turn], orientation)
 
-                        # If box, player continues next turn, and box added to boxes[]
                         if is_box_completed(line, lines_used):  # player continue, box added to boxes[]
                             print('We completed a box!')
                             print('Player 1 Score: ' + str(player_score[opponent_turn]) +
