@@ -20,15 +20,17 @@
 # TODO: Replace any conditional checking for vertical/horizontal to use line's orientation property @ line[3]
 # ######################################################################################################################
 
+# import sys
 import pygame
+import math
 from pygame.locals import *
 
 ########################################################################################################################
 # Some "constants"
 ########################################################################################################################
 GAME_TITLE = 'Dots and Boxes'
-COLS = 5
-ROWS = 5
+COLS = 7
+ROWS = 7
 DISPLAY_WIDTH = 800
 DISPLAY_HEIGHT = 600
 PADDING = 100
@@ -61,7 +63,7 @@ def is_box_completed(new_line, lines_used):  # line ~> start_pos, end_pos, color
     if new_line[3] == HORIZONTAL:  # either the top of a box, or bottom of a box
         for line in lines_used:  # check if line is parallel and that distance is one cell away
             if line[0][0] == new_line[0][0] and line[1][0] == new_line[1][0] and \
-                    (abs(line[0][1] - new_line[0][1])) == int(((DISPLAY_HEIGHT - (2 * PADDING)) / (ROWS - 1))):
+                    (abs(line[0][1] - new_line[0][1])) <= math.ceil(((DISPLAY_HEIGHT - (2 * PADDING)) / (ROWS - 1))):
                 if line[0][1] > new_line[0][1]:  # our line may be the top side of a box
                     left = right = False
                     vert_lines_used = (x for x in lines_used if x[3] == VERTICAL)
@@ -92,7 +94,7 @@ def is_box_completed(new_line, lines_used):  # line ~> start_pos, end_pos, color
     elif new_line[3] == VERTICAL:  # either the left or right hand side of a box
         for line in lines_used:  # check if line is parallel and that distance is one cell away
             if line[0][1] == new_line[0][1] and line[1][1] == new_line[1][1] \
-                    and (abs(line[0][0] - new_line[0][0])) == int(((DISPLAY_WIDTH - (2 * PADDING)) / (COLS - 1))):
+                    and (abs(line[0][0] - new_line[0][0])) <= math.ceil(((DISPLAY_WIDTH - (2 * PADDING)) / (COLS - 1))):
                 if line[0][0] > new_line[0][0]:  # our line may be the left side of a box
                     top = bottom = False
                     horz_lines_used = (x for x in lines_used if x[3] == HORIZONTAL)
@@ -159,9 +161,9 @@ def generate_lines():
     lines_remaining = []
     for x in range(0, COLS - 1):  # Generate our horizontal lines..
         for y in range(0, ROWS):
-            x_start = int((PADDING + ((DISPLAY_WIDTH - 2 * PADDING) / (COLS - 1)) * x))
-            x_end = int((PADDING + ((DISPLAY_WIDTH - 2 * PADDING) / (COLS - 1)) * (x + 1)))
-            y_cord = int((PADDING + ((DISPLAY_HEIGHT - 2 * PADDING) / (ROWS - 1)) * y))
+            x_start = math.floor((PADDING + ((DISPLAY_WIDTH - 2 * PADDING) / (COLS - 1)) * x))
+            x_end = math.floor((PADDING + ((DISPLAY_WIDTH - 2 * PADDING) / (COLS - 1)) * (x + 1)))
+            y_cord = math.floor((PADDING + ((DISPLAY_HEIGHT - 2 * PADDING) / (ROWS - 1)) * y))
             start_pos = (x_start, y_cord)
             end_pos = (x_end, y_cord)
             line = (start_pos, end_pos, LIGHT_GREY, HORIZONTAL)
@@ -169,9 +171,9 @@ def generate_lines():
 
     for x in range(0, COLS):  # Generate our vertical lines...
         for y in range(0, ROWS - 1):
-            x_cord = int((PADDING + ((DISPLAY_WIDTH - 2 * PADDING) / (COLS - 1)) * x))
-            y_start = int((PADDING + ((DISPLAY_HEIGHT - 2 * PADDING) / (ROWS - 1)) * y))
-            y_end = int((PADDING + ((DISPLAY_HEIGHT - 2 * PADDING) / (ROWS - 1)) * (y + 1)))
+            x_cord = math.floor((PADDING + ((DISPLAY_WIDTH - 2 * PADDING) / (COLS - 1)) * x))
+            y_start = math.floor((PADDING + ((DISPLAY_HEIGHT - 2 * PADDING) / (ROWS - 1)) * y))
+            y_end = math.floor((PADDING + ((DISPLAY_HEIGHT - 2 * PADDING) / (ROWS - 1)) * (y + 1)))
             start_pos = (x_cord, y_start)
             end_pos = (x_cord, y_end)
             line = (start_pos, end_pos, LIGHT_GREY, VERTICAL)
@@ -189,7 +191,7 @@ def game_loop():
         clock.tick(10)  # limits while loop to 10 iterations/second
 
         if computer_opponent and opponent_turn:  # TODO: Implement this logic...
-            print('Computer Turn')
+            print('Computer\'s Turn')
 
         else:
             for event in pygame.event.get():
@@ -220,7 +222,7 @@ def draw_game(lines_remaining, lines_used):  # Things we're drawing...
     for line in lines_used:
         pygame.draw.line(screen, line[2], line[0], line[1], 4)
 
-    # Time to draw some dots.
+    # Draw some dots.
     for x in range(0, COLS):
         for y in range(0, ROWS):
             x_cord = int((PADDING + ((DISPLAY_WIDTH - 2 * PADDING) / (COLS - 1)) * x))
@@ -252,7 +254,7 @@ def evaluate_click(event, lines_remaining, lines_used):
         y_end = line[1][1]
 
         if x_start == x_end:  # horizontal.. make horizontal/vertical lines easier to match
-            horizontal_wiggle = 20
+            horizontal_wiggle = 20  # TODO: change wiggle if grid has lots of dots
             vertical_wiggle = 4
         else:
             horizontal_wiggle = 4
@@ -268,12 +270,12 @@ def process_play(line, lines_remaining, lines_used):
     global opponent_turn
     lines_remaining.remove(line)
     my_line = (line[0], line[1], PLAYER_COLORS[opponent_turn], line[3])
-    lines_used.append(my_line)
 
     if is_box_completed(line, lines_used):  # player continue, box added to boxes[] TODO: success sound or message?
         print('Player 1 Score: ' + str(player_score[0]) + ', Player 2 Score: ' + str(player_score[1]))
     else:  # next player's turn  TODO: perhaps some type of player change notification?
         opponent_turn = not opponent_turn
+    lines_used.append(my_line)
 
 
 def main():
