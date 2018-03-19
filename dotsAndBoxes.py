@@ -5,16 +5,17 @@
 # Project 2: Simple Classic Video Game in Pygame
 # California State University, Fullerton
 # March 18, 2018
-# ######################################################################################################################
+# REQD:#################################################################################################################
+# TODO: Finish by 11pm Friday March 23rd for 10% Extra Credit
 # TODO: Finish start menu by allowing player to choose opponent
-# TODO: Add option for computer player and create Level-0 Brain opponent
+# TODO: Create Level-0 Brain opponent
+# TODO: Need to add the "bunny" - give players option of selecting which "bunny" avatar and use it to mark box
+# NICE:#################################################################################################################
 # TODO: Update game logic to display score of players within game
 # TODO: Add some keys to allow player to create new game / restart game
 # TODO: Detect when game ends, announce winner, ask player if they want to play again or return to main menu
 # TODO: Give player the option to select grid size.. maybe pre-defined list of grid sizes based on desired play length
 # TODO: Maybe give players the option of choosing a color
-# TODO: Need to add the "bunny" - give players option of selecting which "bunny" avatar and use it to mark box
-# TODO: Finish by 11pm Friday March 23rd for 10% Extra Credit
 # TODO: Play a sound when a box is completed, when game is over?
 # TODO: Replace any conditional checking for vertical/horizontal to use line's orientation property @ line[3]
 # ######################################################################################################################
@@ -22,44 +23,40 @@
 import pygame
 from pygame.locals import *
 
-pygame.init()
-clock = pygame.time.Clock()
-
-# Some colors...
+########################################################################################################################
+# Some "constants"
+########################################################################################################################
+GAME_TITLE = 'Dots and Boxes'
+COLS = 5
+ROWS = 5
+DISPLAY_WIDTH = 800
+DISPLAY_HEIGHT = 600
+PADDING = 100
+HORIZONTAL = 0
+VERTICAL = 1
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)  # unused thus far.. could potentially add 2 or more opponents
 BLUE = (0, 0, 255)
 BLACK = (0, 0, 0)
 LIGHT_GREY = (240, 250, 250)
 WHITE = (255, 255, 255)
-
-########
-DISPLAY_WIDTH = 800
-DISPLAY_HEIGHT = 600
-PADDING = 100
-
-HORIZONTAL = 0
-VERTICAL = 1
-
-COLS = 5
-ROWS = 5
-
-horizontal_lines = (COLS - 1) * ROWS
-vertical_lines = COLS * (ROWS - 1)
-total_turns = horizontal_lines + vertical_lines
-
+PLAYER_COLORS = [BLUE, RED]
+########################################################################################################################
+# Initialization values..
+########################################################################################################################
 boxes = []
-player_colors = [BLUE, RED]
 player_score = [0, 0]
 opponent_turn = False
 computer_opponent = False
-######
+########################################################################################################################
 
+pygame.init()
+pygame.display.set_caption(GAME_TITLE)  # title of the window...
 screen = pygame.display.set_mode([DISPLAY_WIDTH, DISPLAY_HEIGHT])
-pygame.display.set_caption('Dots and Boxes')  # title of the window...
+clock = pygame.time.Clock()
 
 
-def is_box_completed(new_line, lines_used):  # line ~> start_pos, end_pos, color, orientation (0 = horz, 1 = vert)
+def is_box_completed(new_line, lines_used):  # line ~> start_pos, end_pos, color, orientation
     box_count = len(boxes)
     if new_line[3] == HORIZONTAL:  # either the top of a box, or bottom of a box
         for line in lines_used:  # check if line is parallel and that distance is one cell away
@@ -76,7 +73,7 @@ def is_box_completed(new_line, lines_used):  # line ~> start_pos, end_pos, color
                     if left and right:
                         print('We have created a box by adding a TOP')
                         player_score[opponent_turn] += 1
-                        box = (new_line[0], player_colors[opponent_turn])
+                        box = (new_line[0], PLAYER_COLORS[opponent_turn])
                         boxes.append(box)
                 else:  # our line may be the bottom side of a box
                     left = right = False
@@ -89,7 +86,7 @@ def is_box_completed(new_line, lines_used):  # line ~> start_pos, end_pos, color
                     if left and right:
                         print('We have created a box by adding a BOTTOM')
                         player_score[opponent_turn] += 1
-                        box = (line[0], player_colors[opponent_turn])
+                        box = (line[0], PLAYER_COLORS[opponent_turn])
                         boxes.append(box)
 
     elif new_line[3] == VERTICAL:  # either the left or right hand side of a box
@@ -107,7 +104,7 @@ def is_box_completed(new_line, lines_used):  # line ~> start_pos, end_pos, color
                     if top and bottom:
                         print('We have created a box by adding a LEFT')
                         player_score[opponent_turn] += 1
-                        box = (new_line[0], player_colors[opponent_turn])
+                        box = (new_line[0], PLAYER_COLORS[opponent_turn])
                         boxes.append(box)
                 else:  # our line may be the right side of a box
                     top = bottom = False
@@ -120,7 +117,7 @@ def is_box_completed(new_line, lines_used):  # line ~> start_pos, end_pos, color
                     if top and bottom:
                         print('We have created a box by adding a RIGHT')
                         player_score[opponent_turn] += 1
-                        box = (line[0], player_colors[opponent_turn])
+                        box = (line[0], PLAYER_COLORS[opponent_turn])
                         boxes.append(box)
 
     if len(boxes) > box_count:
@@ -129,7 +126,7 @@ def is_box_completed(new_line, lines_used):  # line ~> start_pos, end_pos, color
         return False
 
 
-def game_intro():
+def game_menu():
     intro = True
     while intro:
         clock.tick(10)  # limits while loop to 10 iterations/second
@@ -149,7 +146,7 @@ def game_intro():
 
         # Display our 'Dots and Boxes' banner..
         banner_font = pygame.font.Font('ARCADECLASSIC.TTF', 90)
-        text_surface = banner_font.render('Dots and Boxes', True, BLACK)
+        text_surface = banner_font.render(GAME_TITLE, True, BLACK)
         text_rect = text_surface.get_rect()  # get rect, byoch!
         text_rect.center = ((DISPLAY_WIDTH / 2), 45)
         screen.blit(text_surface, text_rect)
@@ -160,8 +157,7 @@ def game_intro():
 
 def generate_lines():
     lines_remaining = []
-    # Generate our horizontal lines..
-    for x in range(0, COLS - 1):
+    for x in range(0, COLS - 1):  # Generate our horizontal lines..
         for y in range(0, ROWS):
             x_start = int((PADDING + ((DISPLAY_WIDTH - 2 * PADDING) / (COLS - 1)) * x))
             x_end = int((PADDING + ((DISPLAY_WIDTH - 2 * PADDING) / (COLS - 1)) * (x + 1)))
@@ -171,8 +167,7 @@ def generate_lines():
             line = (start_pos, end_pos, LIGHT_GREY, HORIZONTAL)
             lines_remaining.append(line)
 
-    # Generate our vertical lines...
-    for x in range(0, COLS):
+    for x in range(0, COLS):  # Generate our vertical lines...
         for y in range(0, ROWS - 1):
             x_cord = int((PADDING + ((DISPLAY_WIDTH - 2 * PADDING) / (COLS - 1)) * x))
             y_start = int((PADDING + ((DISPLAY_HEIGHT - 2 * PADDING) / (ROWS - 1)) * y))
@@ -193,17 +188,18 @@ def game_loop():
     while continue_loop:
         clock.tick(10)  # limits while loop to 10 iterations/second
 
-        if computer_opponent and opponent_turn:
-            print('computer turn')
+        if computer_opponent and opponent_turn:  # TODO: Implement this logic...
+            print('Computer Turn')
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                continue_loop = False
-            elif event.type == KEYDOWN:
-                if event.key == K_ESCAPE:
+        else:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
                     continue_loop = False
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                evaluate_click(event, lines_remaining, lines_used)
+                elif event.type == KEYDOWN:
+                    if event.key == K_ESCAPE:
+                        continue_loop = False
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    evaluate_click(event, lines_remaining, lines_used)
 
         draw_game(lines_remaining, lines_used)
 
@@ -213,18 +209,18 @@ def draw_game(lines_remaining, lines_used):  # Things we're drawing...
 
     # Display our 'Dots and Boxes' banner..
     banner_font = pygame.font.Font('ARCADECLASSIC.TTF', 46)
-    text_surface = banner_font.render('Dots and Boxes', True, BLACK)
+    text_surface = banner_font.render(GAME_TITLE, True, BLACK)
     text_rect = text_surface.get_rect()  # get rect, byoch!
     text_rect.center = ((DISPLAY_WIDTH / 2), 23)
     screen.blit(text_surface, text_rect)
 
-    # Draw out lines from lines_remaining
+    # Draw out lines from lines_remaining and lines_used
     for line in lines_remaining:
         pygame.draw.line(screen, line[2], line[0], line[1], 1)
     for line in lines_used:
         pygame.draw.line(screen, line[2], line[0], line[1], 4)
 
-    # Time to draw some dots...
+    # Time to draw some dots.
     for x in range(0, COLS):
         for y in range(0, ROWS):
             x_cord = int((PADDING + ((DISPLAY_WIDTH - 2 * PADDING) / (COLS - 1)) * x))
@@ -233,9 +229,9 @@ def draw_game(lines_remaining, lines_used):  # Things we're drawing...
             pygame.draw.circle(screen, BLACK, pos, 5)
 
     # We must draw our '1' or '2' inside of boxes the players own
-    box_font = pygame.font.Font('ARCADECLASSIC.TTF', 25)
+    box_font = pygame.font.Font('ARCADECLASSIC.TTF', 25)  # TODO: should we make font size a function of grid size?
     for box in boxes:
-        if box[1] == player_colors[0]:
+        if box[1] == PLAYER_COLORS[0]:
             box_text_surface = box_font.render('1', True, box[1])
         else:
             box_text_surface = box_font.render('2', True, box[1])
@@ -263,7 +259,7 @@ def evaluate_click(event, lines_remaining, lines_used):
             vertical_wiggle = 20
 
         if x_end + horizontal_wiggle >= x >= x_start - horizontal_wiggle \
-                and y_end + vertical_wiggle >= y >= y_start - vertical_wiggle:  # match
+                and y_end + vertical_wiggle >= y >= y_start - vertical_wiggle:  # clicked in boundary of remaining line
             process_play(line, lines_remaining, lines_used)
             break
 
@@ -271,21 +267,17 @@ def evaluate_click(event, lines_remaining, lines_used):
 def process_play(line, lines_remaining, lines_used):
     global opponent_turn
     lines_remaining.remove(line)
-    start_pos = line[0]
-    end_pos = line[1]
-    orientation = line[3]
-    my_line = (start_pos, end_pos, player_colors[opponent_turn], orientation)
-
-    if is_box_completed(line, lines_used):  # player continue, box added to boxes[]
-        print('Player 1 Score: ' + str(player_score[0]) + ', Player 2 Score: ' + str(player_score[1]))
-    else:  # next player's turn
-        opponent_turn = not opponent_turn
-
+    my_line = (line[0], line[1], PLAYER_COLORS[opponent_turn], line[3])
     lines_used.append(my_line)
+
+    if is_box_completed(line, lines_used):  # player continue, box added to boxes[] TODO: success sound or message?
+        print('Player 1 Score: ' + str(player_score[0]) + ', Player 2 Score: ' + str(player_score[1]))
+    else:  # next player's turn  TODO: perhaps some type of player change notification?
+        opponent_turn = not opponent_turn
 
 
 def main():
-    game_intro()
+    game_menu()
     game_loop()
 
     pygame.quit()
