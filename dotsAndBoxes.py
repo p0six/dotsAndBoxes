@@ -461,13 +461,14 @@ def draw_game(lines_remaining, lines_used):  # Things we're drawing...
     # check if end of game
     if len(lines_remaining) == 0:
         # Display the winner!
-        winner = None
-        if player_score[0] > player_score[1]:
-            winner = 1
-        else:
-            winner = 2
         winner_font = pygame.font.Font('ARCADECLASSIC.TTF', 80)
-        winner_text_surface = winner_font.render('Winner! P' + str(winner), True, WHITE)
+        if player_score[0] > player_score[1]:
+            winner_text_surface = winner_font.render('Winner! P1', True, WHITE)
+        elif player_score[0] < player_score[1]:
+            winner_text_surface = winner_font.render('Winner! P2', True, WHITE)
+        else:
+            winner_text_surface = winner_font.render('Tie!', True, WHITE)
+
         winner_rect = winner_text_surface.get_rect()  # get rect, byoch!
         winner_rect.center = ((DISPLAY_WIDTH / 2), winner_rect.bottom)
         winner_rect.bottom = DISPLAY_HEIGHT / 3
