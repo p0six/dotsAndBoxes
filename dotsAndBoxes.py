@@ -4,11 +4,8 @@
 # CPSC-386 - Intro to Video Game Development
 # Project 2: Simple Classic Video Game in Pygame
 # California State University, Fullerton
-# March 18, 2018
-# REQD:#################################################################################################################
-# TODO: Need to add the "bunny" - give players option of selecting which "bunny" avatar and use it to mark box
-# TODO: Finish by 11pm Friday March 23rd for 10% Extra Credit
-# NICE:#################################################################################################################
+# March 23, 2018
+# ######################################################################################################################
 # TODO: Add some keys to allow player to create new game / restart game
 # TODO: Play a sound when game is over?
 # TODO: Maybe give players the option of choosing a color
@@ -199,7 +196,6 @@ def game_menu():
                     elif index == 1:
                         computer_opponent = True
                     elif index == 2:
-                        # TODO: change back
                         COLS = ROWS = 5
                     elif index == 3:
                         COLS = ROWS = 7
@@ -333,7 +329,7 @@ def game_loop():
     while continue_loop:
         clock.tick(10)  # limits while loop to 10 iterations/second
 
-        if computer_opponent and opponent_turn and len(lines_remaining) > 0:  # TODO: Implement this logic...
+        if computer_opponent and opponent_turn and len(lines_remaining) > 0:
             my_rand = random.randint(0, len(lines_remaining) - 1)
             process_play(lines_remaining[my_rand], lines_remaining, lines_used)
             clock.tick(5000)
@@ -383,24 +379,20 @@ def draw_game(lines_remaining, lines_used):  # Things we're drawing...
 
     # Display player scores....
     score_font = pygame.font.Font('JOYSTIX_MONOSPACE.ttf', 14)
-    # p1_text_surface = score_font.render('Player 1: ' + str(player_score[0]) + ' pts', True, PLAYER_COLORS[0])
     p1_text_surface = score_font.render('Player 1: ' + str(player_score[0]) + ' pts', True,
                                         p1_button_fg[not opponent_turn])
     p1_text_rect = p1_text_surface.get_rect()
     p1_text_rect.left = 10
     p1_text_rect.top = 8
     button_human = (p1_text_rect.left - 10, p1_text_rect.top, (p1_text_rect.right + 20) - p1_text_rect.left, 20)
-    # pygame.draw.rect(screen, player_button_bg[not opponent_turn], button_human)
     pygame.draw.rect(screen, p1_button_fg[opponent_turn], button_human)
     screen.blit(p1_text_surface, p1_text_rect)
 
-    # p2_text_surface = score_font.render('Player 2: ' + str(player_score[1]) + ' pts', True, PLAYER_COLORS[1])
     p2_text_surface = score_font.render('Player 2: ' + str(player_score[1]) + ' pts', True, p2_button_fg[opponent_turn])
     p2_text_rect = p2_text_surface.get_rect()
     p2_text_rect.left = p1_text_rect.left
     p2_text_rect.top = p1_text_rect.bottom
     button_human = (p2_text_rect.left - 10, p2_text_rect.top, (p2_text_rect.right + 20) - p2_text_rect.left, 20)
-    # pygame.draw.rect(screen, player_button_bg[opponent_turn], button_human)
     pygame.draw.rect(screen, p2_button_fg[not opponent_turn], button_human)
     screen.blit(p2_text_surface, p2_text_rect)
 
@@ -518,13 +510,12 @@ def process_play(line, lines_remaining, lines_used):
     my_line = (line[0], line[1], PLAYER_COLORS[opponent_turn], line[3])
 
     box_count = len(boxes)
-    if is_box_completed(line, lines_used):  # player continue, box added to boxes[] TODO: success sound or message?
-        # print('Player 1 Score: ' + str(player_score[0]) + ', Player 2 Score: ' + str(player_score[1]))
+    if is_box_completed(line, lines_used):  # player continue, box added to boxes[]
         if len(boxes) - box_count > 1:
             pygame.mixer.Sound('smb_1-up.wav').play()
         else:
             pygame.mixer.Sound('smb_coin.wav').play()
-    else:  # next player's turn  TODO: perhaps some type of player change notification?
+    else:  # next player's turn
         opponent_turn = not opponent_turn
     lines_used.append(my_line)
 
