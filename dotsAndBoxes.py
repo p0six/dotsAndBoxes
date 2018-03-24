@@ -9,15 +9,22 @@
 # DONE: 60% for playable game
 # DONE: 10% for a clearly defined win and lose state
 # DONE: 10% for a legal and random Brain opponent
-# TODO: 10% for online instructions or tutoring
-# TODO: 5% for a reasonable README.txt file
-# TODO: 5% for following the Submission rules
+# DONE: 10% for online instructions or tutoring
+# DONE: 5% for a reasonable README.txt file
+# DONE: 5% for following the Submission rules
 # ######################################################################################################################
 # TODO: Add some keys to allow player to create new game / restart game
 # TODO: Play a sound when game is over?
 # TODO: Maybe give players the option of choosing a color
 # TODO: Boxes to represent punches / kicks to opponents bunny avatar, SF2 with an energy bar based on lines_remaining
 # ######################################################################################################################
+# Description:
+# The dots and boxes game, as described here: https://en.wikipedia.org/wiki/Dots_and_Boxes
+#
+# Add a bunny:
+# For each box, there is 1/8 chance the box will include a bunny, awarding 4 points for each box with a bunny.
+# ######################################################################################################################
+
 
 import random
 import pygame
@@ -188,7 +195,7 @@ def game_menu():
             if event.type == pygame.QUIT:
                 return False
             elif event.type == KEYDOWN:
-                if event.key == K_ESCAPE and display_help == True:
+                if event.key == K_ESCAPE and display_help is True:
                     display_help = False
                 elif event.key == K_ESCAPE:
                     return False
@@ -373,7 +380,7 @@ def game_loop():
                     if event.key == K_ESCAPE:
                         return False
                     elif event.key == K_RETURN and len(lines_remaining) == 0:
-                        if continue_game == False:
+                        if continue_game is False:
                             return
                         opponent_turn = False
                         boxes.clear()
@@ -482,11 +489,12 @@ def draw_game(lines_remaining, lines_used):  # Things we're drawing...
         continue_rect.left = winner_rect.left
         continue_rect.top = winner_rect.bottom + 30
 
-        yes_text_surface = continue_font.render('Yes', True,WHITE)
+        yes_text_surface = continue_font.render('Yes', True, WHITE)
         yes_rect = yes_text_surface.get_rect()  # get rect, byoch!
         yes_rect.left = continue_rect.right + 50
         yes_rect.top = continue_rect.top
-        button_yes = (yes_rect.left - 10, yes_rect.top, (yes_rect.right + 20) - yes_rect.left, yes_rect.bottom - yes_rect.top)
+        button_yes = (yes_rect.left - 10, yes_rect.top,
+                      (yes_rect.right + 20) - yes_rect.left, yes_rect.bottom - yes_rect.top)
         pygame.draw.rect(screen, continue_button_bg[continue_game], button_yes)
 
         no_text_surface = continue_font.render('No', True, WHITE)
@@ -557,7 +565,7 @@ def main():
     while continue_loop:
         continue_loop = game_menu()
         if continue_loop:
-            replay_game = game_loop()
+            game_loop()
 
     pygame.quit()
     exit()
