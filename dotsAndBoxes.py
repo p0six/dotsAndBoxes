@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
 # ######################################################################################################################
-# Author: Michael Romero
+# Author: Michael Romero / romerom@csu.fullerton.edu
 # CPSC-386 - Intro to Video Game Development
 # Project 2: Simple Classic Video Game in Pygame
 # California State University, Fullerton
 # March 23, 2018
+# ######################################################################################################################
+# DONE: 60% for playable game
+# DONE: 10% for a clearly defined win and lose state
+# DONE: 10% for a legal and random Brain opponent
+# TODO: 10% for online instructions or tutoring
+# TODO: 5% for a reasonable README.txt file
+# TODO: 5% for following the Submission rules
 # ######################################################################################################################
 # TODO: Add some keys to allow player to create new game / restart game
 # TODO: Play a sound when game is over?
@@ -53,6 +60,7 @@ continue_button_bg = [BLUE, GREEN]
 p1_button_fg = [BLUE, WHITE]
 p2_button_fg = [RED, WHITE]
 bunnies = []
+display_help = False
 ########################################################################################################################
 
 pygame.init()
@@ -172,6 +180,7 @@ def game_menu():
     global opponent_turn
     global boxes
     global player_score
+    global display_help
     intro = True
     while intro:
         clock.tick(10)  # limits while loop to 10 iterations/second
@@ -179,14 +188,17 @@ def game_menu():
             if event.type == pygame.QUIT:
                 return False
             elif event.type == KEYDOWN:
-                if event.key == K_ESCAPE:
+                if event.key == K_ESCAPE and display_help == True:
+                    display_help = False
+                elif event.key == K_ESCAPE:
                     return False
                 elif event.key == K_RETURN:
                     opponent_turn = False
                     boxes.clear()
                     player_score = [0, 0]
-
                     return True
+                elif event.key == K_h:
+                    display_help = True
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 button_clicked = evaluate_menu_click(event)
                 if button_clicked is not None:
@@ -214,10 +226,24 @@ def game_menu():
 
         # Press Enter to Play
         banner_font = pygame.font.Font('ARCADECLASSIC.TTF', 60)
-        start_text_surface = banner_font.render('Enter  Plays  ESC  Exits', True, BLACK)
+        start_text_surface = banner_font.render('Enter to Play', True, BLACK)
         start_text_rect = start_text_surface.get_rect()  # get rect, byoch!
         start_text_rect.center = ((DISPLAY_WIDTH / 2), DISPLAY_HEIGHT - 200)
         screen.blit(start_text_surface, start_text_rect)
+
+        # Escape to Exit
+        esc_text_surface = banner_font.render('ESC to Exit', True, BLACK)
+        esc_text_rect = esc_text_surface.get_rect()  # get rect, byoch!
+        esc_text_rect.center = start_text_rect.center
+        esc_text_rect.top = start_text_rect.bottom
+        screen.blit(esc_text_surface, esc_text_rect)
+
+        # H for Help
+        help_text_surface = banner_font.render('H for Help', True, BLACK)
+        help_text_rect = help_text_surface.get_rect()  # get rect, byoch!
+        help_text_rect.center = esc_text_rect.center
+        help_text_rect.top = esc_text_rect.bottom
+        screen.blit(help_text_surface, help_text_rect)
 
         # Need to display a selection allowing user to choose between 2nd player or computer opponent
         menu_font = pygame.font.Font('ARCADECLASSIC.TTF', 30)
@@ -276,7 +302,6 @@ def game_menu():
         pygame.draw.rect(screen, button_bg[COLS == 9], button9x9)
 
         # rectangle's: (top left x, top left y, width, length)
-
         screen.blit(grid5x5_text_surface, g5x5_rect)
         screen.blit(grid7x7_text_surface, g7x7_rect)
         screen.blit(grid9x9_text_surface, g9x9_rect)
@@ -288,6 +313,12 @@ def game_menu():
         menu_buttons.append(button5x5)
         menu_buttons.append(button7x7)
         menu_buttons.append(button9x9)
+
+        # Draw help if requested..
+        if display_help is True:
+            rules_img = pygame.image.load('rules.png')
+            rules_blit = pygame.transform.scale(rules_img, (800, 600))
+            screen.blit(rules_blit, (0, 0))
 
         # This must run after all draw commands
         pygame.display.flip()
