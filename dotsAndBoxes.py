@@ -467,7 +467,7 @@ def draw_game(lines_remaining, lines_used):  # Things we're drawing...
         elif player_score[0] < player_score[1]:
             winner_text_surface = winner_font.render('Winner! P2', True, WHITE)
         else:
-            winner_text_surface = winner_font.render('Tie!', True, WHITE)
+            winner_text_surface = winner_font.render('Awww! Draw!', True, WHITE)
 
         winner_rect = winner_text_surface.get_rect()  # get rect, byoch!
         winner_rect.center = ((DISPLAY_WIDTH / 2), winner_rect.bottom)
